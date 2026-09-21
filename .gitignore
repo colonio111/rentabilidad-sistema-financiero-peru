@@ -1,0 +1,13 @@
+# Datos crudos descargados automáticamente
+datos_crudos/
+
+# Archivos descargados durante las pruebas
+prueba_sbs/
+prueba_sbs_2025/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Variables de entorno y credenciales
+.env
