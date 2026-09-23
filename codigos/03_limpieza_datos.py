@@ -152,19 +152,6 @@ MESES_SBS = {
     12: "di"
 }
 
-# ---------------------------------------------------------
-# PRUEBA: BANCA MÚLTIPLE - DICIEMBRE 2025
-# ---------------------------------------------------------
-
-archivo_prueba = RUTA_DATOS_CRUDOS / "B-2401-di2025.XLS"
-
-roa_banca, roe_banca, morosidad_banca = extraer_roa_roe_banca(archivo_prueba)
-
-print("\nPRUEBA BANCA MÚLTIPLE - DICIEMBRE 2025")
-print("ROA:", roa_banca)
-print("ROE:", roe_banca)
-print("Morosidad:", morosidad_banca)
-
 
 # ---------------------------------------------------------
 # FUNCIÓN PARA EXTRAER ROA Y ROE DE CAJAS MUNICIPALES
@@ -351,15 +338,6 @@ def extraer_activo_banca(ruta_archivo):
 
     return activo_total
 
-archivo_activo_banca = (
-    RUTA_DATOS_CRUDOS / "B-2201-di2025.XLS"
-)
-
-activo_banca = extraer_activo_banca(archivo_activo_banca)
-
-print("\nPRUEBA TOTAL ACTIVO - BANCA DICIEMBRE 2025")
-print("Total Activo:", activo_banca)
-
 def extraer_activo_cajas(ruta_archivo):
     """
     Extrae el total de activos de las Cajas Municipales
@@ -407,15 +385,6 @@ def extraer_activo_cajas(ruta_archivo):
     activo_total = datos.iloc[fila_activo, columna_total]
 
     return activo_total
-
-archivo_activo_cajas = (
-    RUTA_DATOS_CRUDOS / "C-1101-di2025.XLS"
-)
-
-activo_cajas = extraer_activo_cajas(archivo_activo_cajas)
-
-print("\nPRUEBA TOTAL ACTIVO - CAJAS DICIEMBRE 2025")
-print("Total Activo:", activo_cajas)
 
 def extraer_margen_neto_banca(ruta_archivo):
     """
@@ -539,18 +508,7 @@ def extraer_margen_neto_cajas(ruta_archivo):
     margen_neto = datos.iloc[fila_margen, columna_total]
 
     return margen_neto
-# ---------------------------------------------------------
-# PRUEBA: CAJAS MUNICIPALES - DICIEMBRE 2025
-# ---------------------------------------------------------
 
-archivo_prueba_cajas = RUTA_DATOS_CRUDOS / "C-1301-di2025.XLS"
-
-roa_cajas, roe_cajas, morosidad_cajas = extraer_roa_roe_cajas(archivo_prueba_cajas)
-
-print("\nPRUEBA CAJAS MUNICIPALES - DICIEMBRE 2025")
-print("ROA:", roa_cajas)
-print("ROE:", roe_cajas)
-print("Morosidad:", morosidad_cajas)
 
 def extraer_eficiencia_banca(ruta_archivo):
     """
@@ -686,16 +644,7 @@ def generar_periodos(fecha_inicio, fecha_corte):
 
     return periodos
 
-# ---------------------------------------------------------
-# PRUEBA DE LOS PERIODOS DEL ESTUDIO
-# ---------------------------------------------------------
-
 periodos_estudio = generar_periodos("2015-01", "2025-12")
-
-print("\nPRUEBA DE PERIODOS")
-print("Cantidad de periodos:", len(periodos_estudio))
-print("Primer periodo:", periodos_estudio[0])
-print("Último periodo:", periodos_estudio[-1])
 
 # ---------------------------------------------------------
 # CONSTRUCCIÓN DE LA BASE DE ROA Y ROE
@@ -729,10 +678,10 @@ for anio, mes in periodos_estudio:
         / f"C-1101-{abreviatura_mes}{anio}.XLS"
     )
 
-    # Extraer ROA y ROE de Banca Múltiple
+    # Extraer ROA, ROE y morosidad de Banca Múltiple
     roa_banca, roe_banca, morosidad_banca = extraer_roa_roe_banca(archivo_banca)
 
-    # Extraer ROA y ROE de Cajas Municipales
+    # Extraer ROA, ROE y morosidad de Cajas Municipales
     roa_cajas, roe_cajas, morosidad_cajas = extraer_roa_roe_cajas(archivo_cajas)
 
     activo_banca = extraer_activo_banca(archivo_activo_banca)
@@ -790,7 +739,6 @@ base_rentabilidad.to_csv(
     index=False,
     encoding="utf-8-sig"
 )
-
 print("\nBASE PROCESADA GUARDADA")
 print("Archivo:", ruta_salida)
 print("\nBASE DE RENTABILIDAD")
@@ -798,76 +746,6 @@ print("Número de filas:", len(base_rentabilidad))
 print(base_rentabilidad.head())
 print("\nÚltimas filas:")
 print(base_rentabilidad.tail())
-
-print("\nVALIDACIÓN HISTÓRICA DE TOTAL ACTIVO")
-
-errores_banca_activo = []
-errores_cajas_activo = []
-
-for anio, mes in periodos_estudio:
-    abreviatura_mes = MESES_SBS[mes]
-
-    archivo_banca = (
-        RUTA_DATOS_CRUDOS
-        / f"B-2201-{abreviatura_mes}{anio}.XLS"
-    )
-
-    archivo_cajas = (
-        RUTA_DATOS_CRUDOS
-        / f"C-1101-{abreviatura_mes}{anio}.XLS"
-    )
-
-    try:
-        extraer_activo_banca(archivo_banca)
-    except Exception as error:
-        errores_banca_activo.append(
-            (anio, mes, str(error))
-        )
-
-    try:
-        extraer_activo_cajas(archivo_cajas)
-    except Exception as error:
-        errores_cajas_activo.append(
-            (anio, mes, str(error))
-        )
-
-print("Periodos evaluados:", len(periodos_estudio))
-
-print("\nBANCA MÚLTIPLE")
-print("Errores:", len(errores_banca_activo))
-print("Primeros 10 errores:")
-for error in errores_banca_activo[:10]:
-    print(error)
-
-print("\nCAJAS MUNICIPALES")
-print("Errores:", len(errores_cajas_activo))
-print("Primeros 10 errores:")
-for error in errores_cajas_activo[:10]:
-    print(error)
-
-archivo_banca_2015 = (
-    RUTA_DATOS_CRUDOS / "B-2201-en2015.XLS"
-)
-
-datos_banca_2015 = leer_excel_sbs(archivo_banca_2015)
-
-print("\nESTRUCTURA BANCA - ENERO 2015")
-
-for fila in range(datos_banca_2015.shape[0]):
-    for columna in range(datos_banca_2015.shape[1]):
-        texto = normalizar_texto(
-            datos_banca_2015.iloc[fila, columna]
-        )
-
-        if (
-            texto == "TOTAL ACTIVO"
-            or "TOTAL BANCA MÚLTIPLE" in texto
-        ):
-            print(
-                "Fila:", fila,
-                "| Columna:", columna,
-                "| Texto:", texto
-            )
 
 # ---------------------------------------------------------
 # VALIDACIÓN HISTÓRICA DE TOTAL ACTIVO
@@ -939,469 +817,6 @@ for fila in range(datos_banca_marzo_2015.shape[0]):
                 "| Columna:", columna,
                 "| Texto:", texto
             )
-
-# ---------------------------------------------------------
-# BÚSQUEDA DE MARGEN FINANCIERO NETO
-# ---------------------------------------------------------
-
-archivo_indicadores_banca = (
-    RUTA_DATOS_CRUDOS / "B-2401-di2025.XLS"
-)
-
-archivo_indicadores_cajas = (
-    RUTA_DATOS_CRUDOS / "C-1301-di2025.XLS"
-)
-
-datos_margen_banca = leer_excel_sbs(
-    archivo_indicadores_banca
-)
-
-datos_margen_cajas = leer_excel_sbs(
-    archivo_indicadores_cajas
-)
-
-print("\nPOSIBLES INDICADORES DE MARGEN - BANCA")
-
-for fila in range(datos_margen_banca.shape[0]):
-    for columna in range(datos_margen_banca.shape[1]):
-        texto = normalizar_texto(
-            datos_margen_banca.iloc[fila, columna]
-        )
-
-        if "MARGEN" in texto:
-            print(
-                "Fila:", fila,
-                "| Columna:", columna,
-                "| Texto:", texto
-            )
-
-
-print("\nPOSIBLES INDICADORES DE MARGEN - CAJAS")
-
-for fila in range(datos_margen_cajas.shape[0]):
-    for columna in range(datos_margen_cajas.shape[1]):
-        texto = normalizar_texto(
-            datos_margen_cajas.iloc[fila, columna]
-        )
-
-        if "MARGEN" in texto:
-            print(
-                "Fila:", fila,
-                "| Columna:", columna,
-                "| Texto:", texto
-            )
-
-# ---------------------------------------------------------
-# BÚSQUEDA DE MARGEN FINANCIERO EN ESTADOS FINANCIEROS
-# ---------------------------------------------------------
-
-archivo_estado_banca = (
-    RUTA_DATOS_CRUDOS / "B-2201-di2025.XLS"
-)
-
-archivo_estado_cajas = (
-    RUTA_DATOS_CRUDOS / "C-1101-di2025.XLS"
-)
-
-datos_estado_banca = leer_excel_sbs(archivo_estado_banca)
-datos_estado_cajas = leer_excel_sbs(archivo_estado_cajas)
-
-print("\nMARGEN FINANCIERO EN B-2201")
-
-for fila in range(datos_estado_banca.shape[0]):
-    for columna in range(datos_estado_banca.shape[1]):
-        texto = normalizar_texto(
-            datos_estado_banca.iloc[fila, columna]
-        )
-
-        if "MARGEN FINANCIERO" in texto:
-            print(
-                "Fila:", fila,
-                "| Columna:", columna,
-                "| Texto:", texto
-            )
-
-print("\nMARGEN FINANCIERO EN C-1101")
-
-for fila in range(datos_estado_cajas.shape[0]):
-    for columna in range(datos_estado_cajas.shape[1]):
-        texto = normalizar_texto(
-            datos_estado_cajas.iloc[fila, columna]
-        )
-
-        if "MARGEN FINANCIERO" in texto:
-            print(
-                "Fila:", fila,
-                "| Columna:", columna,
-                "| Texto:", texto
-            )
-
-            print("\nBÚSQUEDA GENERAL DE MARGEN FINANCIERO - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2201-di2025.XLS",
-    "B-2401-di2025.XLS",
-    "B-2315-di2025.XLS",
-    "C-1101-di2025.XLS",
-    "C-1301-di2025.XLS",
-    "C-1207-di2025.XLS"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-    datos_revision = leer_excel_sbs(ruta_archivo)
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    encontrado = False
-
-    for fila in range(datos_revision.shape[0]):
-        for columna in range(datos_revision.shape[1]):
-
-            texto = normalizar_texto(
-                datos_revision.iloc[fila, columna]
-            )
-
-            if "MARGEN" in texto:
-                print(
-                    "Fila:", fila,
-                    "| Columna:", columna,
-                    "| Texto:", texto
-                )
-                encontrado = True
-
-    if not encontrado:
-        print("No se encontraron indicadores con la palabra MARGEN.")
-
-
-eficiencia_banca = extraer_eficiencia_banca(
-    RUTA_DATOS_CRUDOS / "B-2401-di2025.XLS"
-)
-
-eficiencia_cajas = extraer_eficiencia_cajas(
-    RUTA_DATOS_CRUDOS / "C-1301-di2025.XLS"
-)
-
-print("\nPRUEBA RATIO DE EFICIENCIA - DICIEMBRE 2025")
-print("Banca Múltiple:", eficiencia_banca)
-print("Cajas Municipales:", eficiencia_cajas)
-
-# ---------------------------------------------------------
-# VALIDACIÓN HISTÓRICA DEL RATIO DE EFICIENCIA
-# ---------------------------------------------------------
-
-errores_eficiencia_banca = []
-errores_eficiencia_cajas = []
-
-for anio, mes in periodos_estudio:
-    abreviatura_mes = MESES_SBS[mes]
-
-    archivo_banca = (
-        RUTA_DATOS_CRUDOS
-        / f"B-2401-{abreviatura_mes}{anio}.XLS"
-    )
-
-    archivo_cajas = (
-        RUTA_DATOS_CRUDOS
-        / f"C-1301-{abreviatura_mes}{anio}.XLS"
-    )
-
-    try:
-        extraer_eficiencia_banca(archivo_banca)
-    except Exception as error:
-        errores_eficiencia_banca.append(
-            (anio, mes, str(error))
-        )
-
-    try:
-        extraer_eficiencia_cajas(archivo_cajas)
-    except Exception as error:
-        errores_eficiencia_cajas.append(
-            (anio, mes, str(error))
-        )
-
-print("\nVALIDACIÓN HISTÓRICA DEL RATIO DE EFICIENCIA")
-print("Periodos evaluados:", len(periodos_estudio))
-
-print("\nBANCA MÚLTIPLE")
-print("Errores:", len(errores_eficiencia_banca))
-
-if errores_eficiencia_banca:
-    print("Primeros 10 errores:")
-    for error in errores_eficiencia_banca[:10]:
-        print(error)
-
-print("\nCAJAS MUNICIPALES")
-print("Errores:", len(errores_eficiencia_cajas))
-
-if errores_eficiencia_cajas:
-    print("Primeros 10 errores:")
-    for error in errores_eficiencia_cajas[:10]:
-        print(error)
-
-
-        print("\nBÚSQUEDA DE PROVISIONES - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2201-di2025.XLS",
-    "C-1101-di2025.XLS"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-    datos_revision = leer_excel_sbs(ruta_archivo)
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    encontrado = False
-
-    for fila in range(datos_revision.shape[0]):
-        for columna in range(datos_revision.shape[1]):
-
-            texto = normalizar_texto(
-                datos_revision.iloc[fila, columna]
-            )
-
-            if "PROVISION" in texto:
-                print(
-                    "Fila:", fila,
-                    "| Columna:", columna,
-                    "| Texto:", texto
-                )
-                encontrado = True
-
-    if not encontrado:
-        print("No se encontraron conceptos con PROVISION.")
-
-        print("\nBÚSQUEDA DE COMPONENTES DEL MARGEN - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2401-di2025.XLS",
-    "C-1301-di2025.XLS"
-]
-
-palabras_busqueda = [
-    "MARGEN",
-    "INGRESOS FINANCIEROS",
-    "GASTOS FINANCIEROS",
-    "PROVISION"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-    datos_revision = leer_excel_sbs(ruta_archivo)
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    for fila in range(datos_revision.shape[0]):
-        for columna in range(datos_revision.shape[1]):
-
-            texto = normalizar_texto(
-                datos_revision.iloc[fila, columna]
-            )
-
-            if any(
-                palabra in texto
-                for palabra in palabras_busqueda
-            ):
-                print(
-                    "Fila:", fila,
-                    "| Columna:", columna,
-                    "| Texto:", texto
-                )
-
-                print("\nINSPECCIÓN DEL ESTADO DE RESULTADOS - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2201-di2025.XLS",
-    "C-1101-di2025.XLS"
-]
-
-conceptos_busqueda = [
-    "MARGEN FINANCIERO",
-    "INGRESOS FINANCIEROS",
-    "GASTOS FINANCIEROS"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-    datos_revision = leer_excel_sbs(ruta_archivo)
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    encontrado = False
-
-    for fila in range(datos_revision.shape[0]):
-        for columna in range(datos_revision.shape[1]):
-
-            texto = normalizar_texto(
-                datos_revision.iloc[fila, columna]
-            )
-
-            if any(
-                concepto in texto
-                for concepto in conceptos_busqueda
-            ):
-                print(
-                    "Fila:", fila,
-                    "| Columna:", columna,
-                    "| Texto:", texto
-                )
-                encontrado = True
-
-    if not encontrado:
-        print("No se encontraron los conceptos buscados.")
-
-        print("\nHOJAS DE LOS ESTADOS FINANCIEROS - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2201-di2025.XLS",
-    "C-1101-di2025.XLS"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    try:
-        excel = pd.ExcelFile(
-            ruta_archivo,
-            engine="xlrd"
-        )
-    except Exception:
-        excel = pd.ExcelFile(
-            ruta_archivo,
-            engine="openpyxl"
-        )
-
-    print("Hojas encontradas:")
-
-    for numero, hoja in enumerate(excel.sheet_names):
-        print(numero, "-", hoja)
-
-        print("\nINSPECCIÓN DE LA SEGUNDA HOJA - DICIEMBRE 2025")
-
-archivos_revision = [
-    "B-2201-di2025.XLS",
-    "C-1101-di2025.XLS"
-]
-
-conceptos_busqueda = [
-    "MARGEN",
-    "INGRESOS FINANCIEROS",
-    "GASTOS FINANCIEROS",
-    "PROVISION"
-]
-
-for nombre_archivo in archivos_revision:
-
-    ruta_archivo = RUTA_DATOS_CRUDOS / nombre_archivo
-
-    print(f"\nArchivo: {nombre_archivo}")
-
-    try:
-        datos = pd.read_excel(
-            ruta_archivo,
-            sheet_name=1,
-            header=None,
-            engine="xlrd"
-        )
-    except Exception:
-        datos = pd.read_excel(
-            ruta_archivo,
-            sheet_name=1,
-            header=None,
-            engine="openpyxl"
-        )
-
-    for fila in range(datos.shape[0]):
-        for columna in range(datos.shape[1]):
-
-            texto = normalizar_texto(
-                datos.iloc[fila, columna]
-            )
-
-            if any(
-                concepto in texto
-                for concepto in conceptos_busqueda
-            ):
-                print(
-                    "Fila:", fila,
-                    "| Columna:", columna,
-                    "| Texto:", texto
-                )
-
-                margen_banca = extraer_margen_neto_banca(
-    RUTA_DATOS_CRUDOS / "B-2201-di2025.XLS"
-)
-
-margen_cajas = extraer_margen_neto_cajas(
-    RUTA_DATOS_CRUDOS / "C-1101-di2025.XLS"
-)
-
-
-print("\nPRUEBA MARGEN FINANCIERO NETO - DICIEMBRE 2025")
-print("Banca Múltiple:", margen_banca)
-print("Cajas Municipales:", margen_cajas)
-
-# ---------------------------------------------------------
-# VALIDACIÓN HISTÓRICA DEL MARGEN FINANCIERO NETO
-# ---------------------------------------------------------
-
-errores_margen_banca = []
-errores_margen_cajas = []
-
-for anio, mes in periodos_estudio:
-    abreviatura_mes = MESES_SBS[mes]
-
-    archivo_banca = (
-        RUTA_DATOS_CRUDOS
-        / f"B-2201-{abreviatura_mes}{anio}.XLS"
-    )
-
-    archivo_cajas = (
-        RUTA_DATOS_CRUDOS
-        / f"C-1101-{abreviatura_mes}{anio}.XLS"
-    )
-
-    try:
-        extraer_margen_neto_banca(archivo_banca)
-    except Exception as error:
-        errores_margen_banca.append(
-            (anio, mes, str(error))
-        )
-
-    try:
-        extraer_margen_neto_cajas(archivo_cajas)
-    except Exception as error:
-        errores_margen_cajas.append(
-            (anio, mes, str(error))
-        )
-
-print("\nVALIDACIÓN HISTÓRICA DEL MARGEN FINANCIERO NETO")
-print("Periodos evaluados:", len(periodos_estudio))
-
-print("\nBANCA MÚLTIPLE")
-print("Errores:", len(errores_margen_banca))
-
-if errores_margen_banca:
-    print("Primeros 10 errores:")
-    for error in errores_margen_banca[:10]:
-        print(error)
-
-print("\nCAJAS MUNICIPALES")
-print("Errores:", len(errores_margen_cajas))
-
-if errores_margen_cajas:
-    print("Primeros 10 errores:")
-    for error in errores_margen_cajas[:10]:
-        print(error)
 
 # ---------------------------------------------------------
 # VALIDACIÓN FINAL DE LA BASE PROCESADA

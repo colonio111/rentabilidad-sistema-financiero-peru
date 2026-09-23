@@ -1,4 +1,4 @@
-# Rentabilidad de las cajas municipales frente a la banca múltiple en el Perú, 2015-2025
+# Rentabilidad de las cajas municipales frente a la banca múltiple en el Perú
 
 ## Autora
 
@@ -10,7 +10,7 @@
 
 Este proyecto analiza y compara la evolución de la rentabilidad de las cajas municipales y la banca múltiple en el sistema financiero peruano durante el periodo 2015-2025.
 
-La rentabilidad será evaluada principalmente mediante los indicadores ROA y ROE. Además, se consideran variables relacionadas con el tamaño, la actividad crediticia y la calidad de la cartera.
+La rentabilidad es evaluada principalmente mediante los indicadores ROA y ROE. Además, se consideran variables relacionadas con el tamaño de los activos, la morosidad, la eficiencia operativa y el margen financiero.
 
 ## Pregunta de investigación
 
@@ -34,7 +34,7 @@ El periodo establecido para la investigación es:
 
 ## Variables del estudio
 
-La base procesada está compuesta por las siguientes variables:
+La base procesada está compuesta actualmente por las siguientes variables:
 
 - `fecha`: periodo mensual correspondiente a la observación.
 - `tipo_institucion`: Banca Múltiple o Cajas Municipales.
@@ -47,7 +47,7 @@ La base procesada está compuesta por las siguientes variables:
 
 ## Extracción realizada
 
-Actualmente se completó la descarga programática de los archivos oficiales de la SBS correspondientes al periodo enero de 2015 a diciembre de 2025.
+Se completó la descarga programática de los archivos oficiales de la SBS correspondientes al periodo enero de 2015 a diciembre de 2025.
 
 Se obtuvieron:
 
@@ -63,7 +63,7 @@ Los archivos originales se conservan sin modificaciones en la carpeta local `dat
 
 ## Base procesada
 
-Se construyó una base preliminar con información mensual para Banca Múltiple y Cajas Municipales durante el periodo 2015-2025.
+Se construyó una base preliminar con información mensual agregada para Banca Múltiple y Cajas Municipales durante el periodo 2015-2025.
 
 Resultados de la validación:
 
@@ -80,13 +80,12 @@ La base se encuentra en:
 
 `datos procesados/base_procesada_2024200495A.csv`
 
-Esta base corresponde a una primera construcción agregada por tipo de institución y podrá ser adaptada posteriormente de acuerdo con los requerimientos finales del trabajo.
+Esta base corresponde a una primera construcción agregada por tipo de institución. Su estructura podrá ser adaptada posteriormente de acuerdo con los requerimientos finales del trabajo, especialmente respecto al nivel de observación por entidad financiera.
 
 ## Estructura actual del proyecto
 
 ```text
 COLONIO/
-
 ├── codigos/
 │   ├── 01_extraccion_api.py
 │   ├── 03_limpieza_datos.py
