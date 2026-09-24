@@ -9,6 +9,7 @@
 
 import pandas as pd
 from pathlib import Path
+import numpy as np
 # ---------------------------------------------------------
 # RUTAS DEL PROYECTO
 # ---------------------------------------------------------
@@ -880,3 +881,72 @@ print(
         ]
     ].max()
 )
+
+# ============================================================
+# VALIDACIÓN FINAL DE COBERTURA TEMPORAL
+# ============================================================
+
+fechas_esperadas = pd.date_range(
+    start="2015-01-01",
+    end="2025-12-01",
+    freq="MS"
+)
+
+for tipo in ["Banca Múltiple", "Cajas Municipales"]:
+    fechas_tipo = (
+        base_rentabilidad.loc[
+            base_rentabilidad["tipo_institucion"] == tipo,
+            "fecha"
+        ]
+        .drop_duplicates()
+        .sort_values()
+    )
+
+    fechas_faltantes = fechas_esperadas.difference(fechas_tipo)
+
+    print(f"\n{tipo}")
+    print(f"Períodos encontrados: {len(fechas_tipo)}")
+    print(f"Períodos faltantes: {len(fechas_faltantes)}")
+
+    if len(fechas_faltantes) > 0:
+        print("Fechas faltantes:")
+        print(fechas_faltantes)
+
+# ============================================================
+# VALIDACIÓN FINAL DE VARIABLES POR TIPO DE INSTITUCIÓN
+# ============================================================
+
+variables_financieras = [
+    "roa",
+    "roe",
+    "morosidad",
+    "tamano_activo",
+    "ratio_eficiencia_operativa",
+    "margen_financiero_neto"
+]
+
+resumen_variables = (
+    base_rentabilidad
+    .groupby("tipo_institucion")[variables_financieras]
+    .agg(["min", "max", "mean"])
+)
+
+print("\nRESUMEN DE VARIABLES POR TIPO DE INSTITUCIÓN")
+print(resumen_variables)
+# ============================================================
+# VALIDACIÓN FINAL DE VALORES NUMÉRICOS
+# ============================================================
+
+valores = base_rentabilidad[variables_financieras]
+
+cantidad_nan = valores.isna().sum().sum()
+cantidad_inf = np.isinf(valores.to_numpy()).sum()
+
+print("\nVALIDACIÓN FINAL DE VALORES NUMÉRICOS")
+print(f"Valores nulos: {cantidad_nan}")
+print(f"Valores infinitos: {cantidad_inf}")
+
+if cantidad_nan == 0 and cantidad_inf == 0:
+    print("Estado: BASE APROBADA")
+else:
+    print("Estado: REVISAR BASE")
