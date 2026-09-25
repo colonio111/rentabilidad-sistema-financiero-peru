@@ -1,0 +1,7 @@
+﻿,roa,roe,morosidad,tamano_activo,ratio_eficiencia_operativa,margen_financiero_neto
+roa,1.0,0.9839,0.2955,-0.6688,-0.13,-0.0227
+roe,0.9839,1.0,0.2607,-0.5336,-0.2913,0.0617
+morosidad,0.2955,0.2607,1.0,-0.2968,-0.0665,-0.2576
+tamano_activo,-0.6688,-0.5336,-0.2968,1.0,-0.5704,0.3925
+ratio_eficiencia_operativa,-0.13,-0.2913,-0.0665,-0.5704,1.0,-0.4156
+margen_financiero_neto,-0.0227,0.0617,-0.2576,0.3925,-0.4156,1.0
